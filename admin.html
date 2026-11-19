@@ -1,0 +1,131 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lima Garden Admin</title><meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box;margin:0}body{font:16px/1.5 system-ui,sans-serif;background:#f2f5ee;color:#17231c}
+header{background:#10261d;color:#fff;padding:12px 18px;display:flex;gap:12px;align-items:center;position:sticky;top:0;z-index:5}header b{flex:1;font-size:18px}
+main{max-width:860px;margin:auto;padding:18px}.card{background:#fff;border:1px solid #d9e2d3;border-radius:14px;padding:18px;margin:14px 0}
+input,select,textarea{border:1.5px solid #b9c8b6;border-radius:10px;padding:9px 11px;font:inherit;width:100%}label{font-weight:700;font-size:14px;display:grid;gap:4px;margin:8px 0}
+.r{display:flex;gap:8px;align-items:center;margin:6px 0}.r>*{flex:1}.r .s{flex:0 0 92px}.r .x{flex:0 0 auto}
+button{font:inherit;border:0;border-radius:99px;padding:9px 18px;font-weight:700;cursor:pointer;background:#f4b63d;color:#10261d}
+button.d{background:#10261d;color:#fff}button.g{background:#e6ece2;color:#17231c}button.x{background:#fbe0dd;color:#a22}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.tabs button{background:#e6ece2}.tabs button.on{background:#2d5a3f;color:#fff}
+#status{margin-left:8px;font-size:14px}.ok{color:#2d7a3f}.bad{color:#b3261e}.err{background:#fbe0dd;color:#8a1c14;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:15px}
+#login{max-width:400px;margin:70px auto}small{color:#4a5d51}
+</style></head><body>
+<div id="login" class="card"><h2>Lima Garden Admin</h2><form id="lf"><label>Password<input type="password" id="pw" autocomplete="current-password" required></label>
+<div class="err" id="le" hidden></div><button class="d" id="lb">Sign in</button></form><p id="diag" style="margin-top:12px"></p></div>
+<div id="app" hidden><header><b>Lima Garden Admin</b><span id="status"></span><button id="save">Save changes</button><button class="g" id="out">Sign out</button></header>
+<main><div class="tabs" id="tabs"></div><div id="pane"></div></main></div>
+<script>var DEFAULTS={
+ restaurantPhone:"254750438215",
+ waiters:[{name:"Waiter 1",phone:"254715066812"},{name:"Waiter 2",phone:"254790913322"}],
+ tables:["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],
+ menu:[
+    { id: "main", title: "Main Meals & Traditional Food", img: "garden", items: [
+      ["Ugali", 50], ["Greens", 50], ["Cabbage", 100], ["Githeri", 100],
+      ["Githeri Fry", 200], ["Githeri Fry & Cabbage", 250], ["Matoke", 100],
+      ["Rice", 150], ["Rice Nyama", 200], ["Chapati", 30], ["Viazi", 100],
+      ["Bread", 100], ["Chips", 250], ["Potato Wedges", 250], ["Tea", 100],
+      ["Eggs", 50], ["Sausage", 70], ["Kachumbari", 100]
+    ]},
+    { id: "beef", title: "Beef", img: "steak", items: [
+      ["Beef 1kg (Uncooked)", 850], ["Beef Choma ½", 600], ["Beef Choma ¼", 350],
+      ["Beef 1kg", 1200], ["Beef Fry ½", 600], ["Beef Fry ¼", 350], ["Beef Fry 1kg", 1200]
+    ]},
+    { id: "chicken", title: "Chicken", img: "grill", items: [
+      ["Kuku Bahati", 3000], ["Broiler", 1000], ["Broiler ½", 500],
+      ["Broiler ¼ (Takeaway)", 300], ["Broiler ½", 600], ["Kienyeji", 2500]
+    ]},
+    { id: "goat", title: "Goat Meat", img: "plate", items: [
+      ["Choma Goat ½", 1470], ["Choma Goat 4kg", 4920], ["Goat 1kg", 1200]
+    ]},
+    { id: "other", title: "Other Meats", items: [
+      ["Liver Fry 1kg", 1000], ["Matumbo Fry 1kg", 800], ["Pork 1kg", 1200]
+    ]},
+    { id: "platters", title: "Platters", items: [
+      ["Platter for 2", 1200], ["Platter for 3", 1600],
+      ["Platter for 4", 2500], ["Platter for 6", 3500]
+    ]},
+    { id: "extras", title: "Other Charges & Activities", note: "Charges are shown for information and are not added to your order.", items: [
+      ["Service Charge", 500, 1], ["Kids Game (Trampoline)", 50]
+    ]}
+ ,{id:"beers",title:"Beers & Ciders",img:"",items:[["Tusker Lager",300],["Tusker Malt",300],["Tusker Cider",300],["White Cap",300],["Guinness",300],["Balozi",280],["Pilsner",280],["Heineken",350],["Savanna",350]]},
+ {id:"tots",title:"Tots & Spirits",items:[["Kenya King (tot)",100],["Chrome (tot)",100],["Smirnoff Vodka (tot)",130],["Captain Morgan (tot)",150],["Johnnie Walker Red (tot)",200],["Jameson (tot)",220]]},
+ {id:"sodas",title:"Sodas, Juice & Water",items:[["Coca-Cola",70],["Fanta",70],["Sprite",70],["Krest",70],["Stoney",70],["Delmonte Juice (glass)",100],["Delmonte Juice 1L",250],["Mineral Water 500ml",60]]}],
+ site:{tagline:"Eat, meet, stay and unwind under the trees.",
+  about:"Lima Garden is a green corner of town for good food, good company and good days. Come for a meal, book a meeting under the trees, host your event, stay the night, or just hang out with friends over live music.",
+  address:"",open24:true,open:"00:00",close:"23:59",facebook:"",tiktok:"",instagram:"",
+  events:[
+   {date:"",title:"Live music nights",text:"Live band and acoustic sets in the garden. Ask us for this week's line-up.",tag:"Live music"},
+   {date:"",title:"Meetings and team days",text:"Quiet garden corners, tables for groups and food served to you while you work.",tag:"Meetings"},
+   {date:"",title:"Weddings, birthdays and parties",text:"Tell us your date and guest numbers and we will plan the space and the menu.",tag:"Events"}],
+  slides:[
+   {title:"Cooked fresh, served hot",text:"Ugali, nyama choma, githeri, chips and more from our garden kitchen.",cta:"Order food",action:"menu:main",img:"steak"},
+   {title:"Choma, chicken and platters",text:"Share a platter for two, four or six under the trees.",cta:"See the meats",action:"menu:chicken",img:"grill"},
+   {title:"Ice-cold Kenyan beers",text:"Tusker, White Cap, Guinness, Pilsner, Balozi and ciders.",cta:"Order a beer",action:"menu:beers",art:"beer"},
+   {title:"Tots and spirits",text:"Kenya King, Chrome, Smirnoff, Johnnie Walker, Jameson and more.",cta:"See tots",action:"menu:tots",art:"tots"},
+   {title:"Sodas and Delmonte juice",text:"Cold sodas, fresh juice and water for the whole family.",cta:"Order drinks",action:"menu:sodas",art:"soda"},
+   {title:"Stay the night",text:"Private self-contained single rooms in the garden, open to guests 24 hours a day.",cta:"Book a room",action:"book:Accommodation",art:"room"},
+   {title:"Meetings, parties and live music",text:"Hire a corner, plan your event or catch the next live night.",cta:"See what's on",action:"#events",img:"garden"}],
+  rooms:[
+   {name:"Single self-contained room",price:"Ask for rate",text:"Your own private room with its own bathroom, a few steps from the garden. Open to guests 24 hours a day.",photo:""}],
+  tiles:[
+   {title:"Garden restaurant",text:"Grills, traditional meals and platters, cooked fresh.",img:"plate",service:"Table reservation",size:"big",go:"Reserve a table"},
+   {title:"Self-contained rooms",text:"Single private rooms, open 24 hours.",art:"room",service:"Accommodation",size:"big",go:"Book a room"},
+   {title:"Meetings",text:"Shaded corners for teams and clients.",art:"meet",service:"Meeting space",go:"Book a space"},
+   {title:"Events and parties",text:"Birthdays, weddings, launches and kids' play.",img:"garden",service:"Event or party",go:"Plan an event"},
+   {title:"Live music and hangouts",text:"Friends, drinks and good sound.",art:"music",service:"Live music enquiry",go:"Ask what's on"},
+   {title:"Spa",text:"Relax and reset.",art:"spa",service:"Spa",go:"Book a session"},
+   {title:"Barbershop",text:"Fresh cut, fresh start.",art:"barber",service:"Barbershop",go:"Book a cut"},
+   {title:"Car wash",text:"Get your car cleaned while you eat.",art:"wash",service:"Car wash",go:"Book a wash"}]}
+};</script>
+<script>
+(function(){var $=function(i){return document.getElementById(i)},pw="",cfg,tab="Menu",dirty=false;
+var TABS=["Menu","Slides","Tiles","Rooms","Waiters","Events","Tables","Site"];
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function call(url,opt){return fetch(url,opt).then(function(r){return r.text().then(function(t){var j={};try{j=JSON.parse(t)}catch(e){}return{ok:r.ok,status:r.status,j:j}})})}
+function diagnose(){return call("/api/login").then(function(r){var m;
+if(r.status===404||r.status===405&&!r.j.passwordSet&&r.j.error===undefined&&!("dbSet" in r.j))m="The server code is not deployed (/api/login was not found). Make sure the api folder with config.js, login.js and _lib.js is in your project, then redeploy.";
+else if(!r.j.passwordSet)m="ADMIN_PASSWORD is not set. In Vercel go to Settings > Environment Variables, add it, then redeploy.";
+else if(!r.j.dbSet)m="Password is set, but no database is connected. Add Upstash Redis under Storage and connect it to this project, then redeploy. You can still sign in, but saving will fail.";
+else m="Server is configured. If sign-in fails, the password is wrong.";$("diag").innerHTML="<small><b>Setup check:</b> "+m+"</small>"}).catch(function(){$("diag").innerHTML="<small>Could not reach the server.</small>"})}
+function get(p){return p.split(".").reduce(function(o,k){return o[k]},cfg)}
+function set(p,v){var k=p.split("."),l=k.pop();k.reduce(function(o,x){return o[x]},cfg)[l]=v;dirty=true;$("status").textContent="Unsaved changes";$("status").className=""}
+function inp(p,l,type){return'<label>'+l+'<input data-p="'+p+'" '+(type?'type="'+type+'"':"")+' value="'+esc(get(p))+'"></label>'}
+function shrink(f,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(800,im.width),h=im.height*w/im.width,c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);cb(c.toDataURL("image/jpeg",.6))};im.src=r.result};r.readAsDataURL(f)}
+function photo(p){var v=get(p);return'<div class="r">'+(v?'<img src="'+v+'" style="flex:0 0 90px;height:60px;object-fit:cover;border-radius:8px">':"")+'<label style="margin:0">Photo<input type="file" accept="image/*" data-up="'+p+'"></label>'+(v?'<button class="x" data-clr="'+p+'">Remove photo</button>':"")+'</div>'}
+function ev(){return cfg.site.events}
+function render(){$("tabs").innerHTML=TABS.map(function(t){return'<button class="'+(t===tab?"on":"")+'" data-t="'+t+'">'+t+'</button>'}).join("");var h="";
+if(tab==="Waiters"){h='<div class="card"><h3>Waiters</h3><small>Customers pick a waiter by name; WhatsApp opens to that number. Use international format, e.g. 254715066812.</small>'+cfg.waiters.map(function(w,i){return'<div class="r"><input data-p="waiters.'+i+'.name" value="'+esc(w.name)+'" placeholder="Name"><input data-p="waiters.'+i+'.phone" value="'+esc(w.phone)+'" placeholder="2547..."><button class="x" data-del="waiters:'+i+'">Remove</button></div>'}).join("")+'<button data-add="waiter">Add waiter</button></div>'}
+if(tab==="Tables")h='<div class="card"><h3>Tables</h3><label>Table names, separated by commas<textarea id="tb" rows="3">'+esc(cfg.tables.join(", "))+'</textarea></label><small>Example: 1, 2, 3, Patio 1, VIP</small></div>';
+if(tab==="Menu")h='<div class="card"><h3>Menu, drinks and prices</h3><small>Change any name or price. Use Add item inside a category to add food or drinks. Tick Info only for charges that should not be orderable.</small><br><br><button data-add="cat">Add new category</button></div>'+cfg.menu.map(function(m,c){return'<div class="card"><div class="r"><input data-p="menu.'+c+'.title" value="'+esc(m.title)+'"><button class="x" data-del="menu:'+c+'">Delete category</button></div>'+photo("menu."+c+".photo")+'<button class="g" data-add="item:'+c+'">Add item</button>'+m.items.map(function(it,i){return'<div class="r"><input data-p="menu.'+c+'.items.'+i+'.0" value="'+esc(it[0])+'"><input class="s" type="number" data-n="1" data-p="menu.'+c+'.items.'+i+'.1" value="'+it[1]+'"><label class="s" style="font-weight:400;display:flex;gap:4px"><input type="checkbox" style="width:auto" data-ck="menu.'+c+'.items.'+i+'.2" '+(it[2]?"checked":"")+'>Info only</label><button class="x" data-del="item:'+c+':'+i+'">x</button></div>'}).join("")+'</div>'}).join("");
+if(tab==="Slides")h='<div class="card"><h3>Home slideshow</h3><small>Add a real photo to each slide. Without one, a built-in picture is used. Photos are shrunk automatically.</small></div>'+cfg.site.slides.map(function(s,i){var p="site.slides."+i;return'<div class="card">'+inp(p+".title","Headline")+'<label>Text<textarea rows="2" data-p="'+p+'.text">'+esc(s.text)+'</textarea></label>'+inp(p+".cta","Button text")+'<label>Button does<select data-p="'+p+'.action">'+cfg.menu.map(function(m){return'<option value="menu:'+m.id+'" '+(s.action==="menu:"+m.id?"selected":"")+'>Open menu: '+esc(m.title)+'</option>'}).join("")+['book:Accommodation|Book a room','book:Table reservation|Reserve a table','book:Event or party|Plan an event','#events|Show events','call|Call the restaurant'].map(function(o){o=o.split("|");return'<option value="'+o[0]+'" '+(s.action===o[0]?"selected":"")+'>'+o[1]+'</option>'}).join("")+'</select></label>'+photo(p+".photo")+'<button class="x" data-del="slide:'+i+'">Remove slide</button></div>'}).join("")+'<button data-add="slide">Add slide</button>';
+if(tab==="Tiles")h='<div class="card"><h3>Everything in one place</h3><small>The picture tiles on the home page. Add a photo to each.</small></div>'+cfg.site.tiles.map(function(s,i){var p="site.tiles."+i;return'<div class="card"><div class="two">'+inp(p+".title","Title")+inp(p+".go","Button label")+'</div>'+inp(p+".text","Short text")+'<div class="two"><label>Booking goes to<select data-p="'+p+'.service">'+["Table reservation","Meeting space","Event or party","Accommodation","Spa","Barbershop","Car wash","Live music enquiry"].map(function(o){return'<option '+(s.service===o?"selected":"")+'>'+o+'</option>'}).join("")+'</select></label><label>Size<select data-p="'+p+'.size"><option value="" '+(s.size==="big"?"":"selected")+'>Normal</option><option value="big" '+(s.size==="big"?"selected":"")+'>Large</option></select></label></div>'+photo(p+".photo")+'<button class="x" data-del="tile:'+i+'">Remove tile</button></div>'}).join("")+'<button data-add="tile">Add tile</button>';
+if(tab==="Rooms")h='<div class="card"><h3>Rooms</h3></div>'+cfg.site.rooms.map(function(r,i){var p="site.rooms."+i;return'<div class="card"><div class="two">'+inp(p+".name","Room name")+inp(p+".price","Price (e.g. KES 2,500 per night)")+'</div><label>Details<textarea rows="2" data-p="'+p+'.text">'+esc(r.text)+'</textarea></label>'+photo(p+".photo")+'<button class="x" data-del="room:'+i+'">Remove room</button></div>'}).join("")+'<button data-add="room">Add room</button>';
+if(tab==="Events")h='<div class="card"><h3>Events and live music</h3><small>Leave the date empty for something that happens every week.</small>'+ev().map(function(e,i){var p="site.events."+i;return'<div class="card" style="background:#f7faf4"><div class="two">'+inp(p+".title","Title")+inp(p+".date","Date","date")+inp(p+".tag","Label (Live music, Meetings...)")+'</div><label>Details<textarea rows="2" data-p="'+p+'.text">'+esc(e.text)+'</textarea></label><button class="x" data-del="ev:'+i+'">Remove event</button></div>'}).join("")+'<button data-add="ev">Add event</button></div>';
+if(tab==="Site")h='<div class="card"><h3>Contacts and site text</h3>'+inp("restaurantPhone","Restaurant WhatsApp number (e.g. 254750438215)")+inp("site.tagline","Main headline")+'<label>About us<textarea rows="4" data-p="site.about">'+esc(cfg.site.about)+'</textarea></label>'+inp("site.address","Address or directions")+'<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto" data-ck="site.open24" '+(cfg.site.open24!==0&&cfg.site.open24!==false?"checked":"")+'>Open 24 hours, every day</label><small>If unticked, set hours below.</small>'+inp("site.open","Opens (24h, e.g. 08:00)")+inp("site.close","Closes (e.g. 22:00)")+inp("site.facebook","Facebook page link")+inp("site.tiktok","TikTok link")+inp("site.instagram","Instagram link (optional)")+'</div>';
+$("pane").innerHTML=h}
+$("tabs").onclick=function(e){var b=e.target.closest("[data-t]");if(b){tab=b.dataset.t;render()}};
+$("pane").oninput=function(e){var t=e.target;if(t.id==="tb"){cfg.tables=t.value.split(",").map(function(x){return x.trim()}).filter(Boolean);set("tables",cfg.tables);return}
+if(t.dataset.p)set(t.dataset.p,t.dataset.n?+t.value||0:t.value);if(t.dataset.ck)set(t.dataset.ck,t.checked?1:0)};
+$("pane").onchange=function(e){var t=e.target;if(t.dataset.up&&t.files[0])shrink(t.files[0],function(d){set(t.dataset.up,d);render()})};
+$("pane").onclick=function(e){var b=e.target.closest("button");if(!b)return;var a=b.dataset.add,d=b.dataset.del;
+if(a==="tile")cfg.site.tiles.push({title:"New service",text:"",art:"garden",service:"Table reservation",size:"",go:"Book now"});if(a==="slide")cfg.site.slides.push({title:"New slide",text:"",cta:"Order now",action:"menu:main",art:"garden"});if(a==="room")cfg.site.rooms.push({name:"New room",price:"Ask for rate",text:"",photo:""});if(a==="waiter")cfg.waiters.push({name:"",phone:""});if(a==="cat")cfg.menu.push({id:"c"+Date.now(),title:"New category",items:[]});if(a&&a.indexOf("item:")===0)cfg.menu[+a.split(":")[1]].items.push(["New item",0]);if(a==="ev")ev().push({date:"",title:"New event",text:"",tag:"Event"});
+if(d){var p=d.split(":"),n=+p[1];if(!confirm("Remove this?"))return;if(p[0]==="waiters")cfg.waiters.splice(n,1);if(p[0]==="menu")cfg.menu.splice(n,1);if(p[0]==="item")cfg.menu[n].items.splice(+p[2],1);if(p[0]==="ev")ev().splice(n,1);if(p[0]==="tile")cfg.site.tiles.splice(n,1);if(p[0]==="slide")cfg.site.slides.splice(n,1);if(p[0]==="room")cfg.site.rooms.splice(n,1)}
+if(b.dataset.clr){set(b.dataset.clr,"");render()}
+if(a||d){dirty=true;$("status").textContent="Unsaved changes";render()}};
+function start(){return call("/api/config?_="+Date.now()).then(function(r){var c=r.j.config||{};cfg=JSON.parse(JSON.stringify(DEFAULTS));
+Object.keys(c).forEach(function(k){if(k!=="site")cfg[k]=c[k]});cfg.site=Object.assign({},DEFAULTS.site,c.site||{});if(!Array.isArray(cfg.site.events))cfg.site.events=[];
+$("login").hidden=true;$("app").hidden=false;render()})}
+$("lf").onsubmit=function(e){e.preventDefault();var le=$("le");le.hidden=true;$("lb").disabled=true;
+call("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("pw").value})}).then(function(r){
+if(!r.ok)throw new Error(r.j.error||(r.status===404?"Server code not found (/api/login returned 404).":"Could not sign in (error "+r.status+")."));
+pw=$("pw").value;try{sessionStorage.setItem("lima-admin",pw)}catch(x){}return start()}).catch(function(x){le.textContent=x.message;le.hidden=false;diagnose()}).then(function(){$("lb").disabled=false})};
+$("save").onclick=function(){var body=JSON.stringify(cfg);if(body.length>950000){$("status").textContent="Too many large photos ("+Math.round(body.length/1000)+" KB). Remove a few photos and try again.";$("status").className="bad";return}
+$("status").textContent="Saving...";call("/api/config",{method:"PUT",headers:{"Content-Type":"application/json","x-admin-password":pw},body:body}).then(function(r){
+if(!r.ok)throw new Error(r.j.error||"Save failed ("+r.status+")");dirty=false;$("status").textContent="Saved. Live within 10 seconds.";$("status").className="ok"}).catch(function(x){$("status").textContent=x.message;$("status").className="bad"})};
+$("out").onclick=function(){try{sessionStorage.removeItem("lima-admin")}catch(x){}location.reload()};
+window.onbeforeunload=function(){return dirty?"Unsaved changes":undefined};
+diagnose();var saved;try{saved=sessionStorage.getItem("lima-admin")}catch(x){}
+if(saved){pw=saved;call("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:saved})}).then(function(r){if(r.ok)start()})}})();
+</script></body></html>

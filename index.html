@@ -8,10 +8,11 @@
 <style>
 :root{--deep:#10261d;--moss:#2d5a3f;--leaf:#4f8f5d;--sun:#f4b63d;--mist:#f2f5ee;--ink:#17231c;--hib:#c8453b;--r:18px}
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth;scroll-padding-top:70px}
-body{font:17px/1.6 Figtree,system-ui,sans-serif;color:var(--ink);background:var(--mist);padding-bottom:env(safe-area-inset-bottom)}
+body{padding-bottom:96px;font:17px/1.6 Figtree,system-ui,sans-serif;color:var(--ink);background:var(--mist);padding-bottom:env(safe-area-inset-bottom)}
 h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,sans-serif;line-height:1.05;letter-spacing:-.02em}
 a{color:inherit}button,input,select,textarea{font:inherit}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+[hidden]{display:none!important}
 .wrap{max-width:1120px;margin:auto;padding:0 20px}
 nav{position:sticky;top:0;z-index:20;background:rgba(16,38,29,.92);backdrop-filter:blur(8px);color:#fff;padding-top:env(safe-area-inset-top)}
 nav .wrap{display:flex;align-items:center;gap:18px;height:62px}
@@ -49,6 +50,9 @@ section{padding:80px 0}h2{font-size:clamp(32px,5vw,54px);margin-bottom:14px}
 .assure{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.assure span{background:#fff;border:1px solid #d9e2d3;border-radius:99px;padding:6px 16px;font-weight:700;color:var(--moss);font-size:15px}
 .ol{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #b9c8b6}.ol span:first-child{flex:1}.ol .x2{background:#fbe0dd;color:#a22;border:0;border-radius:99px;padding:4px 10px;font-weight:700;cursor:pointer;font-size:13px}
 .ot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}.clr{background:none;border:0;text-decoration:underline;cursor:pointer;color:var(--hib);font-weight:700}
+.tabs button.on{background:var(--moss);color:#fff}.desc{display:block;font-size:14px;color:#5a6d60}.search{margin-top:18px;max-width:420px}
+.am{display:flex;flex-wrap:wrap;gap:6px}.am span{background:#e6ece2;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:700;color:var(--moss)}
+.rev{background:#fff;border:1px solid #d9e2d3;border-radius:var(--r);padding:22px}.rev i{color:var(--sun);font-style:normal;letter-spacing:2px}.rev p{margin:8px 0}
 .events{background:var(--deep);color:#fff}.events .lead{color:#c3d5c9}
 .evgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:30px}
 .ev{border:1px solid rgba(255,255,255,.2);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:10px}
@@ -102,10 +106,12 @@ dialog form{display:grid;gap:12px}.seg{display:grid;grid-template-columns:1fr 1f
 <section id="stay" style="padding-top:0"><div class="wrap"><h2>Stay with us</h2><p class="lead">Single self-contained rooms, open 24 hours. Book your room and we will confirm on WhatsApp.</p><div class="rooms" id="rooms"></div></div></section>
 
 <section id="menu"><div class="wrap"><h2>The menu</h2><p class="lead">Add dishes, then send your order to a waiter or the restaurant on WhatsApp.</p>
-<div class="tabs" id="tabs" role="tablist"></div><div class="menuwrap"><div id="items"></div><img id="mimg" alt="" hidden></div></div></section>
+<input class="search" id="msearch" type="search" placeholder="Search the menu: beer, ugali, chicken..." aria-label="Search the menu"><div class="tabs" id="tabs" role="tablist"></div><div class="menuwrap"><div id="items"></div><img id="mimg" alt="" hidden></div></div></section>
+
+<section id="reviews" hidden style="padding-top:0"><div class="wrap"><h2>What guests say</h2><div class="evgrid" id="rv"></div><p style="margin-top:18px"><a id="rvl" class="btn dark" target="_blank" rel="noopener" hidden>Leave a review</a></p></div></section>
 
 <section id="book" style="padding-top:0"><div class="wrap visit"><div><h2>Plan your visit</h2><p class="lead">Meetings, events, rooms, or a quiet table for two. Send us the details and we will confirm on WhatsApp.</p>
-<p class="note" id="addr" style="font-size:17px;margin-top:18px"></p></div>
+<p class="note" id="addr" style="font-size:17px;margin-top:18px"></p><a id="dir" class="btn dark" target="_blank" rel="noopener" hidden style="margin-top:10px">Get directions</a><div id="map"></div></div>
 <form class="card" id="enq"><label>Name<input id="en" required></label>
 <label>What do you need?<select id="es"><option>Table reservation</option><option>Meeting space</option><option>Event or party</option><option>Accommodation</option><option>Spa</option><option>Barbershop</option><option>Car wash</option><option>Live music enquiry</option></select></label>
 <div class="two"><label>Date<input type="date" id="ed"></label><label>Guests<input type="number" id="eg" min="1" placeholder="2"></label></div>
@@ -114,7 +120,7 @@ dialog form{display:grid;gap:12px}.seg{display:grid;grid-template-columns:1fr 1f
 <footer><div class="wrap"><div><h3>Lima Garden</h3><p id="ft"></p></div>
 <div><h3>Call or WhatsApp</h3><a id="call" href="#"></a><a id="wa" href="#">WhatsApp us</a></div>
 <div><h3>Follow Lima Gardens</h3><a id="fb" target="_blank" rel="noopener">Facebook</a><a id="tt" target="_blank" rel="noopener">TikTok</a><a id="ig" target="_blank" rel="noopener" hidden>Instagram</a></div>
-<div><h3>Hours</h3><p id="hrs"></p></div></div></footer>
+<div><h3>Hours</h3><p id="hrs"></p><p id="faddr" style="margin-top:8px"></p></div></div></footer>
 
 <button class="cartbar" id="cartbar" hidden><span id="cc">0 items</span><span id="ct"></span></button>
 <dialog id="dlg"><form method="dialog" id="of"><h3>Your order</h3><div class="sum" id="sum"></div>
@@ -158,10 +164,10 @@ dialog form{display:grid;gap:12px}.seg{display:grid;grid-template-columns:1fr 1f
     ]}
  ,{id:"beers",title:"Beers & Ciders",img:"",items:[["Tusker Lager",300],["Tusker Malt",300],["Tusker Cider",300],["White Cap",300],["Guinness",300],["Balozi",280],["Pilsner",280],["Heineken",350],["Savanna",350]]},
  {id:"tots",title:"Tots & Spirits",items:[["Kenya King (tot)",100],["Chrome (tot)",100],["Smirnoff Vodka (tot)",130],["Captain Morgan (tot)",150],["Johnnie Walker Red (tot)",200],["Jameson (tot)",220]]},
- {id:"sodas",title:"Sodas, Juice & Water",items:[["Coca-Cola",100],["Fanta",100],["Sprite",100],["Krest",100],["Stoney",100],["Delmonte Juice (glass)",100],["Delmonte Juice 1L",250],["Mineral Water 1000ml",100]]}],
+ {id:"sodas",title:"Sodas, Juice & Water",items:[["Coca-Cola",100],["Fanta",100],["Sprite",100],["Krest",100],["Stoney",100],["Delmonte Juice (glass)",100],["Delmonte Juice 1L",350],["Mineral Water 1000ml",1000]]}],
  site:{tagline:"Eat, meet, stay and unwind under the trees.",
   about:"Lima Garden is a green corner of town for good food, good company and good days. Come for a meal, book a meeting under the trees, host your event, stay the night, or just hang out with friends over live music.",
-  address:"",open24:true,open:"00:00",close:"23:59",facebook:"",tiktok:"",instagram:"",
+  address:"",mapUrl:"",reviewUrl:"",reviews:[],open24:true,open:"00:00",close:"23:59",facebook:"",tiktok:"",instagram:"",
   events:[
    {date:"",title:"Live music nights",text:"Live band and acoustic sets in the garden. Ask us for this week's line-up.",tag:"Live music"},
    {date:"",title:"Meetings and team days",text:"Quiet garden corners, tables for groups and food served to you while you work.",tag:"Meetings"},
@@ -175,7 +181,7 @@ dialog form{display:grid;gap:12px}.seg{display:grid;grid-template-columns:1fr 1f
    {title:"Stay the night",text:"Private self-contained single rooms in the garden, open to guests 24 hours a day.",cta:"Book a room",action:"book:Accommodation",art:"room"},
    {title:"Meetings, parties and live music",text:"Hire a corner, plan your event or catch the next live night.",cta:"See what's on",action:"#events",img:"garden"}],
   rooms:[
-   {name:"Single self-contained room",price:"Ask for rate",text:"Your own private room with its own bathroom, a few steps from the garden. Open to guests 24 hours a day.",photo:""}],
+   {name:"Single self-contained room",price:"Ask for rate",text:"Your own private room with its own bathroom, a few steps from the garden. Open to guests 24 hours a day.",photo:"",amenities:"Single room, Self-contained, Open 24 hours",times:""}],
   tiles:[
    {title:"Garden restaurant",text:"Grills, traditional meals and platters, cooked fresh.",img:"plate",service:"Table reservation",size:"big",go:"Reserve a table"},
    {title:"Self-contained rooms",text:"Single private rooms, open 24 hours.",art:"room",service:"Accommodation",size:"big",go:"Book a room"},
@@ -196,7 +202,7 @@ $("addr").textContent=s.address?"Find us: "+s.address:"";$("ft").textContent=s.t
 var p=digits(c.restaurantPhone);$("call").textContent="0"+p.slice(3);$("call").href="tel:+"+p;$("wa").onclick=function(e){e.preventDefault();wa(p,"Hello Lima Garden, I would like to ask about...")};
 $("fb").href=s.facebook||"https://www.facebook.com/search/top?q=Lima%20Gardens";$("tt").href=s.tiktok||"https://www.tiktok.com/search?q=Lima%20Gardens";
 if(s.instagram){$("ig").href=s.instagram;$("ig").hidden=false}
-$("hrs").textContent=is24()?"Open 24 hours, every day":"Open daily, "+(s.open||"08:00")+" to "+(s.close||"22:00");hours();slides();stay();tiles();events();tabs();items()}
+$("hrs").textContent=is24()?"Open 24 hours, every day":"Open daily, "+(s.open||"08:00")+" to "+(s.close||"22:00");hours();slides();stay();extras();tiles();events();tabs();items()}
 function is24(){var s=C.site||{};return s.open24!==0&&s.open24!==false}
 function hours(){var s=C.site||{};if(is24()){$("status").className="pill open";$("stxt").textContent="Open 24 hours, every day";return}var t=new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Nairobi",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
 var o=(s.open||"08:00")<=t&&t<(s.close||"22:00");$("status").className="pill"+(o?" open":"");$("stxt").textContent=o?"Open now, until "+(s.close||"22:00"):"Closed now, opens "+(s.open||"08:00")}
@@ -209,8 +215,11 @@ return'<div class="ev"><span class="tag">'+esc(e.tag||"Event")+'</span><div clas
 $("evs").onclick=function(x){var b=x.target.closest("[data-e]");if(!b)return;var e=ev[b.dataset.e];wa(C.restaurantPhone,"Hello Lima Garden, I would like to attend: "+e.title+(e.date?" ("+e.date+")":"")+". How many seats are left?")};
 $("tick").textContent=["Live music","Meetings","Events","Garden restaurant","Rooms to stay","Spa","Barbershop","Car wash"].concat(ev.slice(0,3).map(function(e){return e.title})).join("   \u2022   ")+"   \u2022   "}
 var si=0,tm;
-function art(k){var A={beer:["#c98a14","#5a3205","\ud83c\udf7a"],tots:["#7a2e1d","#2a0f0a","\ud83e\udd43"],soda:["#c8453b","#4a1511","\ud83e\udd64"],room:["#2d5a3f","#10261d","\ud83d\udecf\ufe0f"],meet:["#3b4a6b","#141c30","🤝"],music:["#5b2fa0","#1a0c33","🎵"],spa:["#2c7a7b","#0e2f30","💆"],barber:["#5a5a5a","#222","✂️"],wash:["#2b6cb0","#0c2340","🚗"]}[k]||["#2d5a3f","#10261d","\ud83c\udf3f"];
-return"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+A[0]+'"/><stop offset="1" stop-color="'+A[1]+'"/></linearGradient></defs><rect width="1200" height="800" fill="url(#g)"/><text x="900" y="520" font-size="380" text-anchor="middle">'+A[2]+'</text></svg>')}
+function art(k){var P={beer:["#c98a14","#5a3205"],tots:["#7a2e1d","#2a0f0a"],soda:["#c8453b","#4a1511"],meet:["#3b4a6b","#141c30"],music:["#5b2fa0","#1a0c33"],spa:["#2c7a7b","#0e2f30"],barber:["#5a5a5a","#222"],wash:["#2b6cb0","#0c2340"]}[k]||["#2d5a3f","#10261d"];
+return"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+P[0]+'"/><stop offset="1" stop-color="'+P[1]+'"/></linearGradient></defs><rect width="1200" height="800" fill="url(#g)"/><circle cx="950" cy="250" r="320" fill="#fff" opacity=".08"/><circle cx="1050" cy="650" r="200" fill="#fff" opacity=".07"/><circle cx="250" cy="720" r="260" fill="#fff" opacity=".05"/></svg>')}
+function extras(){var s=C.site||{},q=encodeURIComponent(s.address||"Lima Garden");$("dir").href=s.mapUrl||"https://www.google.com/maps/search/?api=1&query="+q;$("dir").hidden=!(s.address||s.mapUrl);
+$("map").innerHTML=s.address?'<iframe title="Map" loading="lazy" src="https://www.google.com/maps?q='+q+'&output=embed" style="border:0;width:100%;height:260px;border-radius:14px;margin-top:14px"></iframe>':"";$("faddr").textContent=s.address||"";
+var R=(s.reviews||[]).filter(function(r){return r&&r.text});$("reviews").hidden=!R.length;$("rv").innerHTML=R.map(function(r){return'<div class="rev"><i>'+"\u2605".repeat(Math.min(5,+r.stars||5))+'</i><p>'+esc(r.text)+'</p><b>'+esc(r.name||"Guest")+'</b></div>'}).join("");$("rvl").hidden=!s.reviewUrl;if(s.reviewUrl)$("rvl").href=s.reviewUrl}
 function slides(){var L=(C.site&&C.site.slides)||[];if(!L.length)return;si=Math.min(si,L.length-1);$("sl").innerHTML=L.map(function(){return'<div class="slide"></div>'}).join("");
 [].forEach.call($("sl").children,function(d,i){var s=L[i];d.style.backgroundImage="url("+JSON.stringify(s.photo||(s.img&&IMG[s.img])||art(s.art))+")"});
 $("dots").innerHTML=L.map(function(s,i){return'<button data-s="'+i+'" aria-label="Slide '+(i+1)+'"></button>'}).join("");show(si);
@@ -221,17 +230,23 @@ function go(a){if(a==="call"){location.href="tel:+"+digits(C.restaurantPhone);re
 if(a.indexOf("menu:")===0){var id=a.slice(5);C.menu.forEach(function(m,i){if(m.id===id)cat=i});tabs();items();$("menu").scrollIntoView();return}
 if(a.indexOf("book:")===0){$("es").value=a.slice(5);$("book").scrollIntoView();$("en").focus();return}
 var el=document.querySelector(a);if(el)el.scrollIntoView()}
-function stay(){var R=(C.site&&C.site.rooms)||[];$("stay").hidden=!R.length;$("rooms").innerHTML=R.map(function(r,i){return'<div class="room"><div class="ph" data-i="'+i+'"></div><div class="b"><h3>'+esc(r.name)+'</h3><strong>'+esc(r.price)+'</strong><p>'+esc(r.text)+'</p><button class="btn" data-r="'+i+'">Book this room</button></div></div>'}).join("");
+function stay(){var R=(C.site&&C.site.rooms)||[];$("stay").hidden=!R.length;$("rooms").innerHTML=R.map(function(r,i){return'<div class="room"><div class="ph" data-i="'+i+'"></div><div class="b"><h3>'+esc(r.name)+'</h3><strong>'+esc(r.price)+'</strong>'+(r.amenities?'<div class="am">'+r.amenities.split(',').map(function(x){return'<span>'+esc(x.trim())+'</span>'}).join('')+'</div>':'')+(r.times?'<small>'+esc(r.times)+'</small>':'')+'<p>'+esc(r.text)+'</p><button class="btn" data-r="'+i+'">Book this room</button></div></div>'}).join("");
 [].forEach.call($("rooms").querySelectorAll(".ph"),function(d){var r=R[d.dataset.i];d.style.backgroundImage="url("+JSON.stringify(r.photo||art("room"))+")"});
 $("rooms").onclick=function(e){var b=e.target.closest("[data-r]");if(!b)return;$("es").value="Accommodation";$("enote").value="Room: "+R[b.dataset.r].name;$("book").scrollIntoView();$("en").focus()}}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-a]");if(b)go(b.dataset.a);var d=e.target.closest("[data-s]");if(d)show(+d.dataset.s)});
 $("prev").onclick=function(){show(si-1)};$("next").onclick=function(){show(si+1)};
 var tx=0;$("hero").addEventListener("touchstart",function(e){tx=e.touches[0].clientX},{passive:true});$("hero").addEventListener("touchend",function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(si+(d<0?1:-1))});
-function tabs(){$("tabs").innerHTML=C.menu.map(function(m,i){return'<button role="tab" aria-selected="'+(i===cat)+'" data-c="'+i+'">'+esc(m.title)+'</button>'}).join("");
-$("tabs").onclick=function(e){var b=e.target.closest("[data-c]");if(b){cat=+b.dataset.c;tabs();items()}}}
-function items(){var m=C.menu[cat]||{items:[]};var im=$("mimg");var ph=m.photo||(m.img&&IMG[m.img]);if(ph){im.src=ph;im.hidden=false}else im.hidden=true;
-$("items").innerHTML=m.items.map(function(it,i){var k=cat+"|"+i,q=cart[k]||0;return'<div class="row"><span>'+esc(it[0])+'</span><b>'+it[1]+'</b>'+(it[2]?"":'<span class="q">'+(q?'<button class="m" data-k="'+k+'" data-d="-1" aria-label="Remove one">\u2212</button><i>'+q+'</i>':"")+'<button data-k="'+k+'" data-d="1" aria-label="Add one">+</button></span>')+'</div>'}).join("")+(m.note?'<p class="note">'+esc(m.note)+'</p>':"");
+function tabs(){$("tabs").innerHTML=C.menu.map(function(m,i){return'<button role="tab" class="'+(i===cat&&!qs?"on":"")+'" aria-selected="'+(i===cat&&!qs)+'" data-c="'+i+'">'+esc(m.title)+'</button>'}).join("");
+$("tabs").onclick=function(e){var b=e.target.closest("[data-c]");if(b){cat=+b.dataset.c;qs="";$("msearch").value="";tabs();items()}}}
+var qs="";
+function row(c,i,it){var k=c+"|"+i,q=cart[k]||0;return'<div class="row"><span>'+esc(it[0])+(it[3]?'<small class="desc">'+esc(it[3])+'</small>':"")+'</span><b>KES '+it[1]+'</b>'+(it[2]?"":'<span class="q">'+(q?'<button class="m" data-k="'+k+'" data-d="-1" aria-label="Remove one">\u2212</button><i>'+q+'</i>':"")+'<button data-k="'+k+'" data-d="1" aria-label="Add one">+</button></span>')+'</div>'}
+function items(){var im=$("mimg"),h="";
+if(qs){C.menu.forEach(function(m,c){m.items.forEach(function(it,i){if((it[0]+" "+(it[3]||"")+" "+m.title).toLowerCase().indexOf(qs)>-1)h+=row(c,i,it)})});h=h||'<p class="note">No match. Try another word.</p>';im.hidden=true}
+else{var m=C.menu[cat]||{items:[]},ph=m.photo||(m.img&&IMG[m.img]);if(ph){im.src=ph;im.hidden=false}else im.hidden=true;
+h='<h3 style="margin-bottom:6px">'+esc(m.title)+'</h3>'+m.items.map(function(it,i){return row(cat,i,it)}).join("")+(m.note?'<p class="note">'+esc(m.note)+'</p>':"")}
+$("items").innerHTML=h;
 $("items").onclick=function(e){var b=e.target.closest("[data-k]");if(!b)return;var k=b.dataset.k;cart[k]=Math.max(0,(cart[k]||0)+ +b.dataset.d);if(!cart[k])delete cart[k];items();bar()}}
+$("msearch").oninput=function(){qs=this.value.trim().toLowerCase();tabs();items()};
 function lines(){var L=[],t=0;Object.keys(cart).forEach(function(k){var p=k.split("|"),it=C.menu[p[0]].items[p[1]];L.push({k:k,n:it[0],q:cart[k],p:it[1]});t+=it[1]*cart[k]});return{L:L,t:t}}
 function bar(){var o=lines(),n=o.L.reduce(function(a,l){return a+l.q},0);$("cartbar").hidden=!n;$("cc").textContent=n+(n>1?" items":" item");$("ct").textContent="KES "+o.t+"  View order"}
 function renderOrder(){var o=lines();if(!o.L.length){$("dlg").close();return}
